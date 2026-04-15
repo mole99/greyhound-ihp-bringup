@@ -37,6 +37,8 @@ You can copy the final bitstreams under `user_designs/designs/greyhound/<example
 To copy the directory structure under `board/` to the Greyhound Main Board, run:
 
 ```
+python3 -m there mkdir bitstreams
+python3 -m there push board/bitstreams/* /bitstreams/
 python3 -m there push board/* /
 ```
 
