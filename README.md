@@ -2,6 +2,12 @@
 
 This repository contains resources and examples to bring up [Greyhound](https://github.com/mole99/greyhound-ihp).
 
+<p align="center">
+  <a href="img/greyhound_v1/greyhound_sine.jpg">
+    <img src="img/greyhound_v1/greyhound_sine.jpg" alt="greyhound_sine" width=65%>
+  </a>
+</p>
+
 ## Prerequisites
 
 Download and flash MicroPython for the RPi Pico onto the Greyhound Main Board: https://micropython.org/download/RPI_PICO/
