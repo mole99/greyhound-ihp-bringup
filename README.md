@@ -69,3 +69,7 @@ python3 -m there rm /myfile.txt
 ```
 
 Make sure to push the file structure in `greyhound_v1/board/` to the Greyhound Main Board. See `greyhound_v1/README.md` for more information.
+
+## License
+
+Unless otherwise stated, the examples and source code are licensed under the Apache 2.0 License.
