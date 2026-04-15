@@ -1,0 +1,99 @@
+# Paths
+FABULOUS_ROOT 		?= $(abspath ../../../fabulous)
+PCF_CONSTRAINTS 		?= $(abspath $(FABULOUS_ROOT)/constraints.pcf)
+TOP 			?= top_wrapper
+
+# Available flip-flops and init value
+FFS                     ?= -ff "\$$_DFF_P_" x \
+			   -ff "\$$_DFFE_PP_" x \
+			   -ff "\$$_SDFF_PP?_" x \
+			   -ff "\$$_SDFFCE_PP?P_" x \
+			   -ff "\$$_DLATCH_?_" x
+
+EXTRA_PLIBS_PATH 	 = -extra-plib ../../../primitives/prims.v \
+			   -extra-plib ../../../primitives/extra_primitives.v \
+
+EXTRA_MAPS_PATH		 = -extra-map ../../../techmap/cells_map.v \
+			   -extra-map ../../../techmap/ff_map.v \
+			   -extra-map ../../../techmap/io_map.v \
+			   -extra-map ../../../techmap/latches_map.v \
+			   -extra-map ../../../techmap/regfile_map.v \
+
+EXTRA_MLIBMAPS_PATH	 = -extra-mlibmap ../../../memlib/ram_regfile.txt
+
+BIT_GEN 			?= ../../../scripts/bit_gen.py
+BIT_TO_HEX 		?= ../../../scripts/bit_to_hex.py
+
+all: synth pnr bitstream hex
+
+# There's something wrong with the carry chain?
+# -> leads to glitches in some VGA designs
+
+synth:
+	yosys \
+	-p \
+	"synth_fabulous \
+	-top $(TOP) \
+	-lut 4 \
+	-carry ha \
+	$(FFS) \
+	$(MULTIPLIER_MAP_PATH) \
+	$(EXTRA_PLIBS_PATH) \
+	$(EXTRA_MAPS_PATH) \
+	$(EXTRA_MLIBMAPS_PATH) \
+	$(CLKBUF_MAP_PATH) ; \
+	show -format dot -prefix $(TOP); \
+	write_json -noscopeinfo $(TOP).json; \
+	" \
+	$(RTL)
+.PHONY: synth
+
+pnr:
+	FAB_ROOT=$(FABULOUS_ROOT) \
+	nextpnr-generic \
+	--uarch fabulous \
+	--json $(TOP).json \
+	--write $(TOP)_out.json \
+	-o fasm=$(TOP).fasm \
+	-o corner=$(CORNER) \
+	-o pcf=$(PCF_CONSTRAINTS) \
+	--verbose \
+	--log $(TOP)_log.txt \
+	--timing-allow-fail
+.PHONY: pnr
+
+bitstream:
+	python3 $(BIT_GEN) \
+	-genBitstream \
+	$(TOP).fasm \
+	$(FABULOUS_ROOT)/bitStreamSpec.bin \
+	$(TOP).bit
+.PHONY: bitstream
+
+hex:
+	python3 $(BIT_TO_HEX) \
+	$(TOP).bit \
+	$(TOP).hex
+
+clean:
+	rm -rf $(TOP).json
+	rm -rf $(TOP)_out.json
+	rm -rf $(TOP).fasm
+	rm -rf $(TOP)_log.txt
+	rm -rf $(TOP).bit
+	rm -rf $(TOP).hex
+	rm -rf $(TOP).vh
+	rm -rf $(TOP).vhd
+	rm -rf $(TOP).csv
+	rm -rf $(TOP).dot
+.PHONY: clean
+
+help:
+	@echo "Commands:"
+	@echo " synth           ... Synthesize the user design"
+	@echo " pnr             ... Run Place and Route"
+	@echo " bitstream       ... Generate the bitstream"
+	@echo " hex             ... Convert bitstream to hex"
+	@echo " clean           ... Delete all generated files"
+	@echo " help            ... Show this help message"
+.phony: help
