@@ -41,7 +41,7 @@ def upload_bitstream(bitstream, freq=25_175_000):
 
     print(f"Starting the clock!")
     
-    pwm0 = machine.PWM(clock, freq=freq, duty_u16=32768) # 50% duty
+    pwm0 = machine.PWM(clock, freq=25_175_000, duty_u16=32768) # 50% duty
     print(pwm0.freq())
 
     print(f"Reset!")
@@ -65,3 +65,6 @@ def upload_bitstream(bitstream, freq=25_175_000):
 
     print(f"Writing the bitstream {bitstream} !")
     write_bitstream_spi(bitstream, fpga_spi, fpga_cs_n)
+    
+    pwm0 = machine.PWM(clock, freq=freq, duty_u16=32768) # 50% duty
+    print(pwm0.freq())
