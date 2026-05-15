@@ -69,6 +69,17 @@ set_io tinyvga_b[1] X0Y9/B
 set_io tinyvga_hs X0Y7/A
 set_io tinyvga_vs X0Y9/A
 
+# 1BitSquared 7 Segment Display - GPIO Bank 0
+
+set_io seg[0] X0Y14/B # A
+set_io seg[1] X0Y14/A # B
+set_io seg[2] X0Y13/B # C
+set_io seg[3] X0Y13/A # D
+set_io seg[4] X0Y12/B # E
+set_io seg[5] X0Y12/A # F
+set_io seg[6] X0Y11/B # G
+set_io ca     X0Y11/A # select
+
 # For tests
 
 set_io all[0] X0Y1/A
