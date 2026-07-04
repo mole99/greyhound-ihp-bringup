@@ -49,3 +49,23 @@ upload_bitstream("bitstreams/greyhound_sine.bit")
 ```
 
 To view VGA output, plug a [Tiny VGA](https://github.com/mole99/tiny-vga) into GPIO Bank1.
+
+## Compiling Firmware
+To compile the firmware the RISC-V compiler is needed. Alternatively the compiled firmware is included in the `board/firmware/` directory.
+
+When compiling the firmware is located at `user_designs/designs/greyhound/firmware/firmware.bin`. 
+
+The firmware includes two bitstreams. One for the XIF and one for the peripheral interface. Those bitstreams can be found in `user_designs/designs/greyhound/firmware/<example.bit>`.
+
+To run the firmware one must execute the following command on the micro python board: 
+```
+upload_firmware("firmware/firmware.bin")
+```
+The upload script is interactive, since uploading the firmware requires Greyhound to be powered down.
+
+For the prograam to run the fetch enable jumper must be set `HIGH`.
+
+To rerun the program without re-uploading run:
+```
+boot_firmware()
+```
