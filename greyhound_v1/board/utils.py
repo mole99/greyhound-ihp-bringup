@@ -42,8 +42,8 @@ def upload_bitstream(bitstream, freq=25_175_000):
 
     print(f"Starting the clock!")
     
-    pwm0 = machine.PWM(clock, freq=25_175_000, duty_u16=32768) # 50% duty
-    print(f"fpga clock: {pwm0.freq()}")
+    pwm0 = machine.PWM(clock, freq=20_000_000, duty_u16=32768) # 50% duty
+    print(f"Greyhound clock: {pwm0.freq()}")
 
     print(f"Reset!")
 
@@ -64,11 +64,11 @@ def upload_bitstream(bitstream, freq=25_175_000):
                 # Next word
                 data = f.read(4)
 
-    print(f"Writing the bitstream {bitstream} !")
+    print(f"Writing the bitstream '{bitstream}'!")
     write_bitstream_spi(bitstream, fpga_spi, fpga_cs_n)
     
     pwm0 = machine.PWM(clock, freq=freq, duty_u16=32768) # 50% duty
-    print(f"fpga clock: {pwm0.freq()}")
+    print(f"Greyhound clock: {pwm0.freq()}")
 
 def write_firmware(flash, firmware):
     with open(firmware, 'br') as f:
@@ -147,9 +147,17 @@ def upload_firmware(firmware:str, freq=25_175_000):
     clock   = machine.Pin(0, machine.Pin.OUT)
     reset_n = machine.Pin(1, machine.Pin.OUT)
 
-    # Check if Greyhound is disabled and wait until it is
+    # Inputs
+    fpga_mode = machine.Pin(2, machine.Pin.IN)
+    fetch_enable = machine.Pin(3, machine.Pin.IN)
+    config_busy = machine.Pin(16, machine.Pin.IN)
+    core_sleep  = machine.Pin(17, machine.Pin.IN)
+
+    # Assert the reset
     reset_n(0)
     time.sleep_ms(10)
+    
+    # Wait for power jumpers removed
     input("Power down Greyhound by removing the power jumpers. Then press Enter to continue...")
 
     # FLASH: FLASH_CLK (10) -> SCLK, FLASH_CS_N (11) -> SCS_N, IO0 (12)-> MOSI, IO1 (13)-> MISO
@@ -186,7 +194,29 @@ def upload_firmware(firmware:str, freq=25_175_000):
     flash_cs_n.init(machine.Pin.IN)
     flash_mosi.init(machine.Pin.IN)
 
-    input("Firmware upload complete power up Greyhound by inserting the power jumpers. Then press Enter to continue...")
+    # Wait for power jumpers enabled
+    input("Firmware upload complete. Power up Greyhound by inserting the power jumpers. Then press Enter to continue...")
+
+    # TODO set fpga_mode and fetch_enable from RP2040?
+
+    if fetch_enable.value() != 1:
+        input("FETCH_ENABLE jumper is low. Resolve then press Enter to continue...")
+
+    pwm0 = machine.PWM(clock, freq=freq, duty_u16=32768) # 50% duty
+    print(f"Greyhound clock: {pwm0.freq()} (requested {freq})")
+
+    # Release the reset, i.e. run the program
+    time.sleep_ms(5)
+    reset_n.value(1)
+    
+    print(f"Greyhound reset deasserted.")
+
+def run_firmware(freq=25_175_000):
+    print(f"machine freq: {machine.freq()}")
+
+    # Setup
+    clock   = machine.Pin(0, machine.Pin.OUT)
+    reset_n = machine.Pin(1, machine.Pin.OUT)
 
     # Inputs
     fpga_mode = machine.Pin(2, machine.Pin.IN)
@@ -194,31 +224,23 @@ def upload_firmware(firmware:str, freq=25_175_000):
     config_busy = machine.Pin(16, machine.Pin.IN)
     core_sleep  = machine.Pin(17, machine.Pin.IN)
 
+    flash_sclk = machine.Pin(10, machine.Pin.IN)
+    flash_cs_n = machine.Pin(11, machine.Pin.IN)
+    flash_mosi = machine.Pin(12, machine.Pin.IN)
+    flash_miso = machine.Pin(13, machine.Pin.IN)
+
+    # Assert the reset
+    reset_n(0)
+    time.sleep_ms(10)
+
     if fetch_enable.value() != 1:
         input("FETCH_ENABLE jumper is low. Resolve then press Enter to continue...")
 
-    pwm0 = machine.PWM(clock, freq=25_175_000, duty_u16=32768) # 50% duty
-    print(pwm0.freq())
+    pwm0 = machine.PWM(clock, freq=freq, duty_u16=32768) # 50% duty
+    print(f"Greyhound clock: {pwm0.freq()} (requested {freq})")
+
+    # Release the reset, i.e. run the program
+    time.sleep_ms(5)
+    reset_n.value(1)
     
-    print("Flash bus released; project_clk requested %d Hz, PWM actual %d Hz"
-          % (freq, pwm0.freq()))
-
-    boot_firmware(release_rst=True, baudrate=57600) # Use half baudrate, Greyhound is clocked slower than sim
-
-def boot_firmware(freq=25_175_000, release_rst=False, baudrate=115200):
-    # Setup
-    clock   = machine.Pin(0, machine.Pin.OUT)
-    reset_n = machine.Pin(1, machine.Pin.OUT)
-
-    if release_rst:
-        time.sleep_ms(5)
-        reset_n.value(1)
-    else:
-        reset_n.value(0)
-        time.sleep_ms(1)
-        pwm0 = machine.PWM(clock, freq=25_175_000, duty_u16=32768) # 50% duty
-        print(pwm0.freq())
-        time.sleep_ms(5)
-        reset_n.value(1)
-
-    print(f"Booted firmware !from Greyhound:")
+    print(f"Greyhound reset deasserted.")

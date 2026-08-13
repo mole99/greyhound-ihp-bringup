@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "bsp/soc.h"
-#include "peripheral.h"
-#include "xif.h"
+#include <soc.h>
+#include <periph_gpio/periph_gpio.h>
+#include <xif_gpio/xif_gpio.h>
 
 #define F_CPU 50000000
 
@@ -31,8 +31,8 @@ uint32_t custom_instruction(uint32_t op1, uint32_t op2) {
 int main()
 {
   // Write bitstream to output 8 bit with the peripheral
-  for (uint32_t i = 0; i < sizeof(peripheral_bitstream)/sizeof(uint32_t); i++) {
-    *REG_BITSTREAM = peripheral_bitstream[i];
+  for (uint32_t i = 0; i < sizeof(periph_gpio_bitstream)/sizeof(uint32_t); i++) {
+    *REG_BITSTREAM = periph_gpio_bitstream[i];
   }
 
   // Test Peripheral by writing an 8 bit value. Bitstream will write the value through to the GPIOs
@@ -50,8 +50,8 @@ int main()
   wait_nop(0x100);
 
   // Write bitstream to output 8 bit with the xif
-  for (uint32_t i = 0; i < sizeof(xif_bitstream)/sizeof(uint32_t); i++) {
-    *REG_BITSTREAM = xif_bitstream[i];
+  for (uint32_t i = 0; i < sizeof(xif_gpio_bitstream)/sizeof(uint32_t); i++) {
+    *REG_BITSTREAM = xif_gpio_bitstream[i];
   }
 
   // Test xif by writing some values. Bitstream will combine op1 and 2 into a single 8 bit value on the GPIOs

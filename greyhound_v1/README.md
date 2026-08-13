@@ -38,7 +38,9 @@ To copy the directory structure under `board/` to the Greyhound Main Board, run:
 
 ```
 python3 -m there mkdir bitstreams
+python3 -m there mkdir firmware
 python3 -m there push board/bitstreams/* /bitstreams/
+python3 -m there push board/firmware/* /firmware/
 python3 -m there push board/* /
 ```
 

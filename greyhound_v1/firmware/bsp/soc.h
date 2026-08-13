@@ -8,12 +8,13 @@
 
 #define FABRIC_CONFIG_BASE      0x40000000
 
-
 #define REG_XIF_OR_PERIPH       (volatile int*)(FABRIC_CONFIG_BASE + 0)
 #define REG_FABRIC_CONFIG_BUSY  (volatile int*)(FABRIC_CONFIG_BASE + 4)
 #define REG_BITSTREAM           (volatile int*)(FABRIC_CONFIG_BASE + 8)
 #define REG_TRIGGER_SLOT        (volatile int*)(FABRIC_CONFIG_BASE + 12)
 
 #define FABRIC_BASE      0x50000000
+
+#define REG_PERIPH_BASE         (volatile int*)(FABRIC_BASE)
 
 #endif
