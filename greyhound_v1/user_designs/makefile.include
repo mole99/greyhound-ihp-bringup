@@ -23,8 +23,9 @@ EXTRA_MLIBMAPS_PATH	 = -extra-mlibmap ../../../memlib/ram_regfile.txt
 
 BIT_GEN 			?= ../../../scripts/bit_gen.py
 BIT_TO_HEX 		?= ../../../scripts/bit_to_hex.py
+BIT_TO_HEADER 		?= ../../../scripts/bit_to_header.py
 
-all: synth pnr bitstream hex
+all: synth pnr bitstream hex header
 
 # There's something wrong with the carry chain?
 # -> leads to glitches in some VGA designs
@@ -74,6 +75,13 @@ hex:
 	python3 $(BIT_TO_HEX) \
 	$(TOP).bit \
 	$(TOP).hex
+.PHONY: hex
+
+header:
+	python3 $(BIT_TO_HEADER) \
+	$(TOP).bit \
+	$(TOP).h
+.PHONY: header
 
 clean:
 	rm -rf $(TOP).json
@@ -82,6 +90,7 @@ clean:
 	rm -rf $(TOP)_log.txt
 	rm -rf $(TOP).bit
 	rm -rf $(TOP).hex
+	rm -rf $(TOP).h
 	rm -rf $(TOP).vh
 	rm -rf $(TOP).vhd
 	rm -rf $(TOP).csv
