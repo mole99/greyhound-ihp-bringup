@@ -130,7 +130,7 @@ def format_flash():
         firstbit=machine.SPI.MSB,
     )
 
-    flash = W25QFlash(spi=fpga_spi, cs=flash_cs_n, baud=115200, software_reset=True)
+    flash = W25QFlash(spi=fpga_spi, cs=flash_cs_n, baud=10_000_000, software_reset=True)
 
     print(f"Erase flash")
     flash.format()
@@ -177,7 +177,7 @@ def upload_firmware(firmware:str, freq=25_175_000):
         firstbit=machine.SPI.MSB,
     )
 
-    flash = W25QFlash(spi=fpga_spi, cs=flash_cs_n, baud=115200, software_reset=True)
+    flash = W25QFlash(spi=fpga_spi, cs=flash_cs_n, baud=10_000_000, software_reset=True)
 
     print(f"Erase flash")
     flash.format()

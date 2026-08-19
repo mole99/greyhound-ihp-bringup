@@ -4,14 +4,14 @@ RISCV_GCC = $(RISCV_EXE_PREFIX)$(RISCV_CC)
 RISCV_AR = $(RISCV_EXE_PREFIX)ar
 RISCV_MARCH ?= rv32imac_zicntr_zicsr_zifencei_zihpm_zca_zcb_zcmp_zcmt_zba_zbb_zbc_zbs
 PYTHON ?= python3
-SRC = xif_periph_gpio.c
-OBJ = xif_periph_gpio.o
+SRC = vga_psram_test.c
+OBJ = vga_psram_test.o
 
 CFLAGS += -Os -g -static -Wall -Wextra -pedantic
 CFLAGS += -mabi=ilp32 -march=$(RISCV_MARCH)
 CFLAGS += -I ../bsp -I ../bsp/drivers/EF_UART -I ../../user_designs/designs/greyhound/
 
-TARGET = xif_periph_gpio
+TARGET = vga_psram_test
 ELF_TARGET = $(TARGET).elf
 BIN_TARGET = $(TARGET).bin
 HEX_TARGET= $(TARGET).hex
@@ -22,12 +22,12 @@ LINKER_SCRIPT = $(BSP_PATH)/link.ld
 LDFLAGS += -T $(LINKER_SCRIPT) -nostartfiles
 LDFLAGS += -L$(ENV_DIR) --specs=nano.specs
 
-all: compile-bsp $(BIN_TARGET)
+all: $(BIN_TARGET)
 
 %.o : %.c
 	$(RISCV_GCC) $(CFLAGS) -c $< -o $@
 
-$(ELF_TARGET): $(OBJ)
+$(ELF_TARGET): $(OBJ) compile-bsp
 	$(RISCV_GCC) $(CFLAGS) $< -L$(BSP_PATH) -l:bsp.a -o $@ $(LDFLAGS)
 
 $(BIN_TARGET): $(ELF_TARGET)

@@ -4,14 +4,14 @@ RISCV_GCC = $(RISCV_EXE_PREFIX)$(RISCV_CC)
 RISCV_AR = $(RISCV_EXE_PREFIX)ar
 RISCV_MARCH ?= rv32imac_zicntr_zicsr_zifencei_zihpm_zca_zcb_zcmp_zcmt_zba_zbb_zbc_zbs
 PYTHON ?= python3
-SRC = xif_periph_gpio.c
-OBJ = xif_periph_gpio.o
+SRC = hello_world.c
+OBJ = hello_world.o
 
 CFLAGS += -Os -g -static -Wall -Wextra -pedantic
 CFLAGS += -mabi=ilp32 -march=$(RISCV_MARCH)
 CFLAGS += -I ../bsp -I ../bsp/drivers/EF_UART -I ../../user_designs/designs/greyhound/
 
-TARGET = xif_periph_gpio
+TARGET = hello_world
 ELF_TARGET = $(TARGET).elf
 BIN_TARGET = $(TARGET).bin
 HEX_TARGET= $(TARGET).hex
