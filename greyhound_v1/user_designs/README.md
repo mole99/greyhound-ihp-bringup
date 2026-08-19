@@ -17,23 +17,6 @@ nix-shell
 
 ## Implement the Designs
 
-The user designs for both fabric families can be found under `user_designs/designs/`.
-Before you build the user designs, you need to select for which tile library and fabric you want to implement the design.
-
-The default is:
-
-```
-export FABRIC=classic_fabric_10x10
-export TILE_LIBRARY=classic
-```
-
-You can change it for example to:
-
-```
-export FABRIC=tiny_fabric_5x5
-export TILE_LIBRARY=tiny
-```
-
 To build all user designs, run:
 
 ```

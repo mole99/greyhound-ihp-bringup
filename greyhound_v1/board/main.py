@@ -6,9 +6,11 @@ from utils import upload_bitstream, upload_firmware, run_firmware
 #time.sleep_ms(5000)
 
 #upload_firmware("firmware/xif_gpio_blink.bin", freq=25_175_000)
-
 #upload_firmware("firmware/greyhound_sine_periph.bin", freq=25_175_000)
+#upload_firmware("firmware/vga_framebuffer_periph.bin", freq=25_175_000)
+#upload_firmware("firmware/vga_framebuffer_periph_old.bin", freq=25_175_000)
+#upload_firmware("firmware/hello_world.bin", freq=25_175_000)
 
-upload_firmware("firmware/vga_framebuffer_periph.bin", freq=25_175_000)
+#upload_firmware("firmware/vga_psram_test.bin", freq=25_175_000)
 
-#run_firmware(freq=25_175_000)
+run_firmware(freq=25_175_000)

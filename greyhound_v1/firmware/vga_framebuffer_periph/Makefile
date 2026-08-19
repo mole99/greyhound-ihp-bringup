@@ -1,13 +1,15 @@
-CV_SW_TOOLCHAIN  ?= /opt/riscv
-RISCV            ?= $(CV_SW_TOOLCHAIN)
-RISCV_EXE_PREFIX ?= $(RISCV)/bin/riscv32-unknown-elf-
+RISCV_EXE_PREFIX ?= riscv32-none-elf-
 RISCV_CC         ?= gcc
 RISCV_GCC = $(RISCV_EXE_PREFIX)$(RISCV_CC)
 RISCV_AR = $(RISCV_EXE_PREFIX)ar
-RISCV_MARCH ?= rv32ima_zicsr #rv32imc_zicsr
+RISCV_MARCH ?= rv32imac_zicntr_zicsr_zifencei_zihpm_zca_zcb_zcmp_zcmt_zba_zbb_zbc_zbs #rv32ima_zicsr
+PYTHON ?= python3
 SRC = vga_framebuffer_periph.c
 OBJ = vga_framebuffer_periph.o
-CFLAGS ?= -Os -g -static -mabi=ilp32 -march=$(RISCV_MARCH) -Wall -pedantic $(RISCV_CFLAGS) -I ../bsp -I ../bsp/drivers/EF_UART -I ../../user_designs/designs/greyhound/
+
+CFLAGS += -Os -g -static -Wall -Wextra -pedantic
+CFLAGS += -mabi=ilp32 -march=$(RISCV_MARCH)
+CFLAGS += -I ../bsp -I ../bsp/drivers/EF_UART -I ../../user_designs/designs/greyhound/
 
 TARGET = vga_framebuffer_periph
 ELF_TARGET = $(TARGET).elf
@@ -64,7 +66,6 @@ vars:
 	@echo "   RISCV_EXE_PREFIX = $(RISCV_EXE_PREFIX)"
 	@echo "   RISCV_GCC        = $(RISCV_GCC)"
 	@echo "   RISCV_MARCH      = $(RISCV_MARCH)"
-	@echo "   RISCV_CFLAGS     = $(RISCV_CFLAGS)"
 	@echo "   CFLAGS           = $(CFLAGS)"
 	cd $(BSP_PATH); make vars
 .phony: vars

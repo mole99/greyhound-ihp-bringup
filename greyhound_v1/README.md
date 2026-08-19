@@ -7,7 +7,7 @@ The following boards were used:
 - https://github.com/mole99/greyhound-main-pcb
 - https://github.com/mole99/greyhound-breakout-pcb
 
-Currently, only the FPGA of Greyhound v1 was tested.
+The eFPGA and the RISC-V CPU of Greyhound v1 was tested. So far everythign seems to work as expected, except for the built-in UART. If you need a UART, you can implement one using the eFPGA.
 
 Important Pins:
 
@@ -53,21 +53,24 @@ upload_bitstream("bitstreams/greyhound_sine.bit")
 To view VGA output, plug a [Tiny VGA](https://github.com/mole99/tiny-vga) into GPIO Bank1.
 
 ## Compiling Firmware
-To compile the firmware the RISC-V compiler is needed. Alternatively the compiled firmware is included in the `board/firmware/` directory.
 
-When compiling the firmware is located at `user_designs/designs/greyhound/firmware/firmware.bin`. 
+To compile the firmware a RISC-V cross-compiler is needed. To enable it, go into `firmware/` and run `nix-shell`.
+The pre-compiled firmware is already included in the `board/firmware/` directory.
 
-The firmware includes two bitstreams. One for the XIF and one for the peripheral interface. Those bitstreams can be found in `user_designs/designs/greyhound/firmware/<example.bit>`.
+To upload new firmware, one must execute the following command on the micro python board: 
 
-To run the firmware one must execute the following command on the micro python board: 
 ```
 upload_firmware("firmware/firmware.bin")
 ```
-The upload script is interactive, since uploading the firmware requires Greyhound to be powered down.
 
+The upload script is interactive, since uploading the firmware requires Greyhound to be powered down.
 For the prograam to run the fetch enable jumper must be set `HIGH`.
 
 To rerun the program without re-uploading run:
+
 ```
-boot_firmware()
+run_firmware(freq=25_175_000)
 ```
+
+This is the default on startup.
+

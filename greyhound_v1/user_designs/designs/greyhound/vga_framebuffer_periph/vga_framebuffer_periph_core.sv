@@ -206,17 +206,41 @@ module vga_framebuffer_periph_core (
     
     // Compose the final colore
     logic [5:0] rgb_o;
+    
+    logic [1:0] r_o;
+    logic [1:0] g_o;
+    logic [1:0] b_o;
+    logic [1:0] r_dither;
+    logic [1:0] g_dither;
+    
+    logic r_lsb, g_lsb;
     always_comb begin
-        rgb_o = pixel_data;
+        rgb_o = pixel_data[5:0];
+        r_o = pixel_data[5:4];
+        g_o = pixel_data[3:2];
+        b_o = pixel_data[1:0];
+        
+        // Slightly darker color used for dithering
+        // clamp black at black
+        r_dither = pixel_data[5:4] == '0 ? '0 : pixel_data[5:4] - 1;
+        g_dither = pixel_data[3:2] == '0 ? '0 : pixel_data[3:2] - 1;
+        
+        r_lsb = pixel_data[7];
+        g_lsb = pixel_data[6];
     end
 
     // Register color output
     logic [5:0] rgb_d;
+    logic dither;
     always_ff @(posedge clk_i) begin
         if (!rst_ni) begin
             rgb_d <= '0;
         end else begin
-            rgb_d <= rgb_o;
+            //rgb_d <= rgb_o;
+            
+            dither <= counter_v ^ counter_h ^ cur_time[0];
+            
+            rgb_d <= {(!r_lsb && dither) ? r_dither : r_o, (!g_lsb && dither) ? g_dither : g_o, b_o};
             
             // Blanking intervall
             if (hblank || vblank) begin

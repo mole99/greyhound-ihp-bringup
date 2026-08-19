@@ -3,17 +3,9 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include <string.h>
 
 #include <soc.h>
 #include <vga_framebuffer_periph/vga_framebuffer_periph.h>
-
-#include "images/image_1.h"
-#include "images/image_2.h"
-#include "images/image_3.h"
-#include "images/image_1_dither.h"
-#include "images/image_2_dither.h"
-#include "images/image_3_dither.h"
 
 #define F_CPU 25175000 // Use VGA frequency
 
@@ -36,15 +28,6 @@ void clear(uint8_t pixel) {
   }
 }
 
-void write_image(const uint8_t image[]) {
-  /*for (int i=0; i<WIDTH*HEIGHT/4; i++) {
-    *(volatile uint32_t*)(FABRIC_BASE + i) = *((const uint32_t*)image + i);
-  }*/
-  
-  memcpy((uint8_t*)FABRIC_BASE, image, WIDTH*HEIGHT);
-}
-
-
 int main()
 {
   // Write bitstream to eFPGA
@@ -64,27 +47,44 @@ int main()
   wait_nop(F_CPU/20);
   clear(0x30); // red
   wait_nop(F_CPU/20);
-  clear(0x4C); // green - lsb set
-  wait_nop(F_CPU/20);
-  clear(0xB0); // red - lsb set
-  wait_nop(F_CPU/20);
-
-  while (1) {
-
-    write_image(image_1_data);
-    wait_nop(F_CPU);
-    write_image(image_1_dither_data);
-    wait_nop(F_CPU);
-    write_image(image_2_data);
-    wait_nop(F_CPU);
-    write_image(image_2_dither_data);
-    wait_nop(F_CPU);
-    write_image(image_3_data);
-    wait_nop(F_CPU);
-    write_image(image_3_dither_data);
-    wait_nop(F_CPU);
-
+  clear(0xFF);
+  wait_nop(F_CPU/4);
+  
+  // 16 Mbit PSRAM, 24 bits address room
+  int x = 0;
+  int y = 0;
+  
+  #define BLOCK_SIZE 32
+  #define WORD_SIZE 4
+  #define BITS_IN_BYTE 8
+  
+  for (int i=0; i<16777216/BITS_IN_BYTE/WORD_SIZE/BLOCK_SIZE; i++) {
+      bool failure = false;
+      
+      for (int j=0; j<1024; j++) {
+          *((volatile int*)(PSRAM_BASE) + i*BLOCK_SIZE + j) = 0xDEADBEEF + i;
+      }
+      
+      for (int j=0; j<1024; j++) {
+          if (*((volatile int*)(PSRAM_BASE) + i*BLOCK_SIZE + j) != 0xDEADBEEF + i) {
+            failure = true;
+          }
+      }
+  
+      if (failure) {
+          set_pixel(x, y, 0x30); // red
+      } else {
+          set_pixel(x, y, 0x0C); // green
+      }
+  
+      x++;
+      if (x >= 160) {
+          y++;
+          x=0;
+      }
   }
+  
+  while (1);
 
   return 0;
 }
