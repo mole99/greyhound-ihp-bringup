@@ -11,13 +11,16 @@ FFS                     ?= -ff "\$$_DFF_P_" x \
 			   -ff "\$$_DLATCH_?_" x
 
 EXTRA_PLIBS_PATH 	 = -extra-plib ../../../primitives/prims.v \
-			   -extra-plib ../../../primitives/extra_primitives.v \
+			   -extra-plib ../../../primitives/extra_primitives.v
 
-EXTRA_MAPS_PATH		 = -extra-map ../../../techmap/cells_map.v \
-			   -extra-map ../../../techmap/ff_map.v \
+CELLS_MAP		 = -cells-map ../../../techmap/cells_map.v
+
+ARITH_MAP		 = -arith-map ../../../techmap/arith_map.v
+
+EXTRA_MAPS_PATH		 = -extra-map ../../../techmap/ff_map.v \
 			   -extra-map ../../../techmap/io_map.v \
 			   -extra-map ../../../techmap/latches_map.v \
-			   -extra-map ../../../techmap/regfile_map.v \
+			   -extra-map ../../../techmap/regfile_map.v
 
 EXTRA_MLIBMAPS_PATH	 = -extra-mlibmap ../../../memlib/ram_regfile.txt
 
@@ -38,6 +41,8 @@ synth:
 	-lut 4 \
 	-carry ha \
 	$(FFS) \
+	$(CELLS_MAP) \
+	$(ARITH_MAP) \
 	$(MULTIPLIER_MAP_PATH) \
 	$(EXTRA_PLIBS_PATH) \
 	$(EXTRA_MAPS_PATH) \
